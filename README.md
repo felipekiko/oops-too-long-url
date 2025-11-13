@@ -37,12 +37,12 @@ Make sure you have the following installed:
 
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
-- Also ensure your AWS credentials are properly configured:
+- Also ensure your AWS credentials are properly configured
 
 ## Installation & Deployment
 
 ### 1. Deploy the backend
-From the backend/ folder:
+From the *backend/* folder:
 
 ```bash
 sam build
@@ -102,13 +102,14 @@ This ensures your users always see the latest version of the site
 
 ## Usage
 
-Open the CloudFront URL in your browser and paste any long URL and click Shorten...ou’ll receive a short URL that redirects to your original one!
+Open the CloudFront URL in your browser and paste any long URL and click Shorten...you’ll receive a short URL that redirects to your original one!
 
 ## ToDo
 
 - [ ] Auditoria nos elementos
 - [ ] Key na API Key
 - [ ] CORS
+- [ ] Test!
 - [ ] Authentication
 - [ ] API Requests Limit
 - [ ] Architecture Diagram
