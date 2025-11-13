@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: OopsTooLong - Backend API (Lambda + DynamoDB)
+Description: OopsTooLongURL - Backend API (Lambda + DynamoDB)
 
 Globals:
   Function:
@@ -16,7 +16,7 @@ Resources:
   UrlTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: oops-too-long
+      TableName: oops-too-long-url
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -28,6 +28,7 @@ Resources:
   PostLinkFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: oops-too-long-url-post-link
       CodeUri: src/post-link/
       Handler: app.lambda_handler
       Policies:
@@ -43,6 +44,7 @@ Resources:
   GetLinkFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: oops-too-long-url-get-link
       CodeUri: src/get-link/
       Handler: app.lambda_handler
       Policies:
@@ -58,13 +60,13 @@ Resources:
   WebBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "oops-too-long-${AWS::Region}-${AWS::AccountId}"
+      BucketName: !Sub "oops-too-long-url-${AWS::AccountId}-${AWS::Region}"
 
   CloudFrontOAC:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: oops-too-long-oac
+        Name: oops-too-long-url-oac
         Description: Origin Access Control for private S3 bucket
         SigningProtocol: sigv4
         SigningBehavior: always
@@ -114,7 +116,7 @@ Resources:
 
 Outputs:
   ApiUrl:
-    Description: "Base URL for OopsTooLong API"
+    Description: "Base URL for OopsTooLongURL API"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
 
   SiteUrl:

@@ -1,6 +1,6 @@
-# OopsTooLong
+# OopsTooLongURL
 
-**OopsTooLong** is a simple and fun URL shortener built with AWS SAM.  
+**OopsTooLongURL** is a simple and fun URL shortener built with AWS SAM.  
 It turns those *ridiculously long Sharepoint URLs* into short and shareable ones...fast, serverless, and cheap!
 
 ## Project Overview
@@ -46,7 +46,7 @@ From the backend/ folder:
 
 ```bash
 sam build
-sam deploy --guided
+sam deploy --stack-name oops-too-long-url --guided
 ```
 
 This will create:
@@ -73,7 +73,7 @@ const API_BASE_URL = "https://<your-api-id>.execute-api.<region>.amazonaws.com/P
 Get the bucket name in the CloudFormation outputs:
 ```
 aws cloudformation describe-stacks \
-  --stack-name oops-too-long \
+  --stack-name oops-too-long-url \
   --query "Stacks[0].Outputs[?OutputKey=='WebBucketName'].OutputValue" \
   --output text
 ```
@@ -86,7 +86,7 @@ aws s3 sync . s3://<your-bucket-name> --delete
 After uploading new frontend files, to invalidate CloudFront cache, run:
 ```
 aws cloudformation describe-stacks \
-  --stack-name oops-too-long \
+  --stack-name oops-too-long-url \
   --query "Stacks[0].Outputs[?OutputKey=='WebDistributionId'].OutputValue" \
   --output text
 ```
@@ -106,10 +106,11 @@ Open the CloudFront URL in your browser and paste any long URL and click Shorten
 
 ## ToDo
 
-- [ ] Create Application
 - [ ] Auditoria nos elementos
 - [ ] Key na API Key
+- [ ] CORS
 - [ ] Authentication
+- [ ] API Requests Limit
 - [ ] Architecture Diagram
 - [ ] Update README.md
 - [ ] Commit
