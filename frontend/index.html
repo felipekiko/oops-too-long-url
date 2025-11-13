@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OopsTooLong - URL Shortener</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>OopsTooLong</h1>
+    <h2>URL Shortener</h2>
+    <p class="subtitle">Turn your big ugly URLs into cute little ones!</p>
+
+    <div class="card">
+      <input id="urlInput" type="text" placeholder="Paste your long URL here..." />
+      <button id="shortenBtn">Shorten</button>
+
+      <div id="result" class="hidden">
+        <p>Your short link:</p>
+        <a id="shortLink" href="#" target="_blank"></a>
+        <button id="copyBtn">Copy</button>
+      </div>
+
+      <p id="errorMsg" class="error hidden"></p>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

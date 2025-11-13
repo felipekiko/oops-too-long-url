@@ -1,0 +1,130 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: OopsTooLong - Backend API (Lambda + DynamoDB)
+
+Globals:
+  Function:
+    Timeout: 5
+    Runtime: python3.12
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref UrlTable
+
+Resources:
+  UrlTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: oops-too-long
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  PostLinkFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/post-link/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UrlTable
+      Events:
+        CreateLinkApi:
+          Type: Api
+          Properties:
+            Path: /create
+            Method: POST
+
+  GetLinkFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get-link/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UrlTable
+      Events:
+        RedirectApi:
+          Type: Api
+          Properties:
+            Path: /{id}
+            Method: GET
+
+  WebBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "oops-too-long-${AWS::Region}-${AWS::AccountId}"
+
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: oops-too-long-oac
+        Description: Origin Access Control for private S3 bucket
+        SigningProtocol: sigv4
+        SigningBehavior: always
+        OriginAccessControlOriginType: s3
+
+  WebDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: WebOrigin
+            DomainName: !GetAtt WebBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            OriginAccessControlId: !Ref CloudFrontOAC
+        DefaultCacheBehavior:
+          TargetOriginId: WebOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+  WebBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontAccess
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${WebBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                "AWS:SourceArn": !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${WebDistribution}"
+
+Outputs:
+  ApiUrl:
+    Description: "Base URL for OopsTooLong API"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+  SiteUrl:
+    Description: "CloudFront URL for the website"
+    Value: !Sub "https://${WebDistribution.DomainName}"
+
+  WebBucketName:
+    Description: "Bucket name"
+    Value: !Ref WebBucket
+
+  WebDistributionId:
+    Description: "CloudFront Distribuition ID"
+    Value: !Ref WebDistribution
